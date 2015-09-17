@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -16,7 +17,7 @@ const (
 )
 
 type ConnMux struct {
-	counter         ConnId
+	counter         uint32
 	werr            error
 	rerr            error
 	wquitch         chan struct{}
@@ -32,11 +33,7 @@ type ConnMux struct {
 }
 
 func (mux *ConnMux) nextConnId() ConnId {
-	mux.Lock()
-	defer mux.Unlock()
-
-	mux.counter++
-	return mux.counter
+	return ConnId(atomic.AddUint32(&mux.counter, 1))
 }
 
 func (mux *ConnMux) newConn(id ConnId) Conn {
