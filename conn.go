@@ -1,5 +1,10 @@
 package squash
 
+import (
+	"net"
+	"time"
+)
+
 type ConnId uint32
 type Reqtype int
 
@@ -20,21 +25,41 @@ type Conn struct {
 	wch chan bool
 }
 
-func (p *Conn) Read(bs []byte) error {
+func (p *Conn) Read(bs []byte) (int, error) {
 	<-p.rch
-	err := p.mux.read(bs)
+	n, err := p.mux.read(bs)
 	p.rch <- true
-	return err
+	return n, err
 }
 
-func (p *Conn) Write(bs []byte) error {
+func (p *Conn) Write(bs []byte) (int, error) {
 	p.mux.reqWrite <- Request{id: p.id, typ: WriteReq}
 	<-p.wch
-	err := p.mux.write(bs)
+	n, err := p.mux.write(bs)
 	p.wch <- true
-	return err
+	return n, err
 }
 
 func (p *Conn) Close() error {
 	return p.mux.delConn(p.id)
+}
+
+func (p *Conn) LocalAddr() net.Addr {
+	return p.mux.conn.LocalAddr()
+}
+
+func (p *Conn) RemoteAddr() net.Addr {
+	return p.mux.conn.RemoteAddr()
+}
+
+func (p *Conn) SetDeadLine(time.Time) error {
+	return nil
+}
+
+func (p *Conn) SetReadDeadLine(time.Time) error {
+	return nil
+}
+
+func (p *Conn) SetWriteDeadLine(time.Time) error {
+	return nil
 }

@@ -62,14 +62,12 @@ func (mux *ConnMux) delConn(id ConnId) error {
 	return nil
 }
 
-func (mux *ConnMux) write(bs []byte) error {
-	_, err := mux.w.Write(bs)
-	return err
+func (mux *ConnMux) write(bs []byte) (int, error) {
+	return mux.w.Write(bs)
 }
 
-func (mux *ConnMux) read(bs []byte) error {
-	_, err := io.ReadFull(mux.r, bs)
-	return err
+func (mux *ConnMux) read(bs []byte) (int, error) {
+	return io.ReadFull(mux.r, bs)
 }
 
 func (mux *ConnMux) handleOutgoing() {
