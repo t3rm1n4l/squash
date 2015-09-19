@@ -52,14 +52,14 @@ func (p *Conn) RemoteAddr() net.Addr {
 	return p.mux.conn.RemoteAddr()
 }
 
-func (p *Conn) SetDeadLine(time.Time) error {
+func (p *Conn) SetDeadline(time.Time) error {
 	return nil
 }
 
-func (p *Conn) SetReadDeadLine(time.Time) error {
+func (p *Conn) SetReadDeadline(time.Time) error {
 	return nil
 }
 
-func (p *Conn) SetWriteDeadLine(time.Time) error {
+func (p *Conn) SetWriteDeadline(time.Time) error {
 	return nil
 }

@@ -24,7 +24,11 @@ func NewClient(addr string) (*Client, error) {
 	return &Client{addr: addr, mux: mux}, nil
 }
 
-func (c *Client) NewConn() Conn {
+func (c *Client) NewConn() *Conn {
 	id := c.mux.nextConnId()
 	return c.mux.newConn(id)
+}
+
+func (c *Client) Close() error {
+	return c.mux.Close()
 }

@@ -6,10 +6,10 @@ import (
 
 type Server struct {
 	laddr string
-	callb func(Conn)
+	callb func(net.Conn)
 }
 
-func NewServer(laddr string, callb func(Conn)) *Server {
+func NewServer(laddr string, callb func(net.Conn)) *Server {
 	return &Server{
 		laddr: laddr,
 		callb: callb,
@@ -28,7 +28,11 @@ func (s *Server) Run() error {
 			return err
 		}
 
-		NewConnMux(conn, s.callb)
+		cb := func(conn *Conn) {
+			s.callb(conn)
+		}
+
+		NewConnMux(conn, cb)
 	}
 
 	return nil

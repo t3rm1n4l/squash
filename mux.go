@@ -28,7 +28,7 @@ type ConnMux struct {
 	raccess         map[ConnId]chan bool
 	waccess         map[ConnId]chan bool
 	reqWrite        chan Request
-	newConnCallback func(Conn)
+	newConnCallback func(*Conn)
 	sync.RWMutex
 }
 
@@ -36,11 +36,11 @@ func (mux *ConnMux) nextConnId() ConnId {
 	return ConnId(atomic.AddUint32(&mux.counter, 1))
 }
 
-func (mux *ConnMux) newConn(id ConnId) Conn {
+func (mux *ConnMux) newConn(id ConnId) *Conn {
 	mux.Lock()
 	defer mux.Unlock()
 
-	p := Conn{
+	p := &Conn{
 		id:  id,
 		mux: mux,
 		rch: make(chan bool),
@@ -127,7 +127,11 @@ func (mux *ConnMux) handleIncoming() {
 	}
 }
 
-func NewConnMux(conn net.Conn, callb func(Conn)) *ConnMux {
+func (mux *ConnMux) Close() error {
+	return mux.conn.Close()
+}
+
+func NewConnMux(conn net.Conn, callb func(*Conn)) *ConnMux {
 	w := bufio.NewWriterSize(conn, wBufSize)
 	r := bufio.NewReaderSize(conn, rBufSize)
 

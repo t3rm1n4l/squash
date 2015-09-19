@@ -27,7 +27,7 @@ func init() {
 	resp = make([]byte, respSize)
 }
 
-func callback(p squash.Conn) {
+func callback(p *squash.Conn) {
 	buf := pool.Get()
 	p.Read(buf.([]byte)[:reqSize])
 	pool.Put(buf)
