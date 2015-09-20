@@ -26,6 +26,9 @@ type Conn struct {
 }
 
 func (p *Conn) Read(bs []byte) (int, error) {
+	if len(bs) == 0 {
+		return 0, nil
+	}
 	<-p.rch
 	n, err := p.mux.read(bs)
 	p.rch <- true
@@ -33,6 +36,9 @@ func (p *Conn) Read(bs []byte) (int, error) {
 }
 
 func (p *Conn) Write(bs []byte) (int, error) {
+	if len(bs) == 0 {
+		return 0, nil
+	}
 	p.mux.reqWrite <- Request{id: p.id, typ: WriteReq}
 	<-p.wch
 	n, err := p.mux.write(bs)
