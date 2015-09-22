@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	reqSize  = 100
-	respSize = 100
+	reqSize  = 200
+	respSize = 200
 )
 
 var (

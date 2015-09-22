@@ -3,13 +3,15 @@ package main
 import (
 	//"fmt"
 	"github.com/t3rm1n4l/squash"
+	"net"
 	"os"
 	"sync"
+	//	"time"
 )
 
 const (
-	reqSize  = 100
-	respSize = 100
+	reqSize  = 200
+	respSize = 200
 )
 
 var (
@@ -27,11 +29,11 @@ func init() {
 	resp = make([]byte, respSize)
 }
 
-func callback(p *squash.Conn) {
+func callback(p net.Conn) {
 	buf := pool.Get()
 	p.Read(buf.([]byte)[:reqSize])
 	pool.Put(buf)
-
+	// time.Sleep(time.Millisecond * 20)
 	p.Write(resp)
 	p.Close()
 }
