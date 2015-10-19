@@ -37,13 +37,18 @@ func main() {
 	defer pprof.StopCPUProfile()
 	var wgc sync.WaitGroup
 	var count uint64
+	var clients []*squash.Client
 
 	addr := os.Args[1]
 	n, _ := strconv.Atoi(os.Args[2])
 	thr, _ := strconv.Atoi(os.Args[3])
 	nclients, _ := strconv.Atoi(os.Args[4])
 	nperthr := n / thr
-	c, _ := squash.NewClient(addr)
+
+	for i := 0; i < nclients; i++ {
+		c, _ := squash.NewClient(addr)
+		clients = append(clients, c)
+	}
 
 	t0 := time.Now()
 
@@ -57,7 +62,7 @@ func main() {
 			go func() {
 				defer wg.Done()
 				for i := 0; i < nperthr; i++ {
-					p := c.NewConn()
+					p := clients[id].NewConn()
 					p.Write(req)
 					buf := pool.Get()
 					p.Read(buf.([]byte)[:respSize])
@@ -77,7 +82,7 @@ func main() {
 
 		wg.Wait()
 		tx := time.Now()
-		fmt.Println(float64(count)/tx.Sub(tm).Seconds(), "req/sec")
+		fmt.Println("client:", id, float64(count)/tx.Sub(tm).Seconds(), "req/sec")
 	}
 
 	for i := 0; i < nclients; i++ {
