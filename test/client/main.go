@@ -41,7 +41,7 @@ func main() {
 	addr := os.Args[1]
 	n, _ := strconv.Atoi(os.Args[2])
 	thr, _ := strconv.Atoi(os.Args[3])
-	nclients, _ := strconv.Atoi(os.Args[3])
+	nclients, _ := strconv.Atoi(os.Args[4])
 	nperthr := n / thr
 	c, _ := squash.NewClient(addr)
 
