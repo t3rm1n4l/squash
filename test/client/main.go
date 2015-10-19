@@ -47,7 +47,7 @@ func main() {
 
 	t0 := time.Now()
 
-	clientWorker := func(wgc *sync.WaitGroup) {
+	clientWorker := func(wgc *sync.WaitGroup, id int) {
 		defer wgc.Done()
 
 		var wg sync.WaitGroup
@@ -66,7 +66,7 @@ func main() {
 					x := atomic.AddUint64(&count, 1)
 					if x == 1000000 {
 						tx := time.Now()
-						fmt.Println(float64(x)/tx.Sub(tm).Seconds(), "req/sec")
+						fmt.Println("client:", id, float64(x)/tx.Sub(tm).Seconds(), "req/sec")
 						tm = tx
 						atomic.StoreUint64(&count, 0)
 					}
@@ -82,10 +82,10 @@ func main() {
 
 	for i := 0; i < nclients; i++ {
 		wgc.Add(1)
-		go clientWorker(&wgc)
+		go clientWorker(&wgc, i)
 	}
 
 	wgc.Wait()
 
-	fmt.Println(float64(n)/time.Since(t0).Seconds(), "req/sec")
+	fmt.Println(float64(n*nclients)/time.Since(t0).Seconds(), "req/sec")
 }
